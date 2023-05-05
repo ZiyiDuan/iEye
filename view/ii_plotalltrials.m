@@ -98,8 +98,10 @@ while trial_cnt <= ii_cfg.numtrials
         fig_cnt = fig_cnt + 1;
         if nfigs > 1
             set(gcf,'NumberTitle','off','Name',sprintf('%s - %i of %i',fn_fortitle,fig_cnt,nfigs));
+%             set(gcf,'YLim',[-5 5]);
         else
             set(gcf,'NumberTitle','off','Name',sprintf('%s',fn_fortitle));
+%             set(gcf,'YLim',[-5 5]);
         end
     end
     
@@ -126,6 +128,7 @@ end
 
 % embiggen
 set(f_han,'Position',0.75*get(0,'Screensize'),'Renderer','painters');
+
 
 return
 

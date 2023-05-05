@@ -14,8 +14,8 @@
 % (see ii_loadparams.m for default values)
 
 
-
-ifg_fn = '/Volumes/home/grace/examples/p_500hz.ifg';
+tmp = pwd;
+ifg_fn = [tmp, '/p_500hz.ifg'];
 
 
 ii_params = ii_loadparams; % load default set of analysis parameters, only change what we have to

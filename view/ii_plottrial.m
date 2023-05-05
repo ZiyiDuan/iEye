@@ -69,6 +69,7 @@ for ii = 1:length(which_chans)
 end
 
 xlim([0 max(myt)]);
+ylim([-5, 5]);
 
 
 % if velocity is a channel, plot this under the graph as heatmap
@@ -125,17 +126,18 @@ if strcmpi(plot_mode,'standard')
     ylabel('Position (\circ)');
     title(sprintf('Trial %i',trial_num));
 else
-    axis tight;
+%     axis tight;
     this_ylim = get(gca,'YLim');
     if abs(this_ylim(1)) < abs(this_ylim(2))
-        %t_han = text(0.25,this_ylim(2),sprintf('Trial %i',trial_num));
-        t_han = text(0.0,3.5,sprintf('Trial %i',trial_num),'FontSize',9);
+%         t_han = text(0.25,this_ylim(2)*1.2,sprintf('Trial %i',trial_num),'FontSize',12);
+        t_han = text(0.0,3.5,sprintf('Trial %i',trial_num),'FontSize',12);
     else
-        t_han = text(0.0,-3.5,sprintf('Trial %i',trial_num),'FontSize',9);
+%         t_han = text(0.25,this_ylim(2)*1.2,sprintf('Trial %i',trial_num),'FontSize',12);
+        t_han = text(0.0,-3.5,sprintf('Trial %i',trial_num),'FontSize',12);
     end
     
     plot(myt,zeros(size(myt)),'k--');
-    axis off;
+%     axis off;
 end
 hold off;
 

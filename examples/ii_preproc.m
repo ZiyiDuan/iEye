@@ -67,8 +67,10 @@ end
 
 % import data
 [ii_data,ii_cfg] = ii_import_edf(edf_fn,cfg_fn,[edf_fn(1:end-4) '_iEye.mat']);
+ii_data.TarX = ones(length(ii_data.TarX),1)*ii_params.resolution(1)/2;
+ii_data.TarY = ones(length(ii_data.TarY),1)*ii_params.resolution(2)/2;
 
-%imported_plot = plot_data(ii_data,{'X','Y'})
+%imported_plot = plot_data(ii_data,{'X','Y','TarX','TarY'})
 
 % truncate data to relevant XDATs
 [ii_data,ii_cfg] = ii_trim(ii_data,ii_cfg,ii_params.valid_epochs,ii_params.epoch_chan);
@@ -76,11 +78,13 @@ end
 %trim_plot = plot_data(ii_data,{'X','Y'})
 % rescale X, Y based on screen info
 [ii_data,ii_cfg] = ii_rescale(ii_data,ii_cfg,{'X','Y'},ii_params.resolution,ii_params.ppd);
+[ii_data,ii_cfg] = ii_rescale(ii_data,ii_cfg,{'TarX','TarY'},ii_params.resolution,ii_params.ppd);
 
 %rescale_plot = plot_data(ii_data,{'X','Y'})
 
 % Invert Y channel (the eye-tracker spits out flipped Y values)
 [ii_data,ii_cfg] = ii_invert(ii_data,ii_cfg,'Y');
+[ii_data,ii_cfg] = ii_invert(ii_data,ii_cfg,'TarY');
 
 %invert_plot = plot_data(ii_data,{'X','Y'})
 % remove extreme-valued X,Y channels (further than the screen edges)
@@ -106,7 +110,7 @@ end
 [ii_data,ii_cfg] = ii_smooth(ii_data,ii_cfg,{'X','Y'},ii_params.smooth_type,...
     ii_params.smooth_amt);
 
-%smooth_plot = plot_data(ii_data,{'X','Y','X_smooth','Y_smooth'})
+% smooth_plot = plot_data(ii_data,{'X','Y','X_smooth','Y_smooth'})
 % compute velocity using the smoothed data
 [ii_data,ii_cfg] = ii_velocity(ii_data,ii_cfg,'X_smooth','Y_smooth');
 
@@ -119,11 +123,11 @@ end
     ii_params.sacc_velocity_thresh,ii_params.sacc_duration_thresh,...
     ii_params.sacc_amplitude_thresh); 
 
-%sacc_plot = ii_plottimeseries(ii_data,ii_cfg,{'X_smooth','Y_smooth'})
+% sacc_plot = ii_plottimeseries(ii_data,ii_cfg,{'X_smooth','Y_smooth'})
 % look for MICROsaccades %update to the above, 7/11/2019, geh
-[ii_data,ii_cfg] = ii_findmicrosaccades(ii_data,ii_cfg,'X_smooth','Y_smooth',...
-    ii_params.sacc_velocity_thresh,ii_params.sacc_duration_thresh,...
-    ii_params.microsacc_amplitude_limit); %keep dur and vel thresh, change amplitude thresh 0.5-1.5 
+% [ii_data,ii_cfg] = ii_findmicrosaccades(ii_data,ii_cfg,'X_smooth','Y_smooth',...
+%     ii_params.sacc_velocity_thresh,ii_params.sacc_duration_thresh,...
+%     ii_params.microsacc_amplitude_limit); %keep dur and vel thresh, change amplitude thresh 0.5-1.5 
 
 
 % find fixation epochs (between saccades and blinks)
@@ -131,8 +135,8 @@ end
 % 'stable' eye positions
 [ii_data,ii_cfg] = ii_findfixations(ii_data,ii_cfg,{'X','Y'},ii_params.fixation_mode);
 
-%fix_plot = ii_plottimeseries(ii_data,ii_cfg,{'X','Y','X_fix','Y_fix','TarX','TarY'},'noselections')
-%legend({'X','Y','X fix','Y fix'})
+% fix_plot = ii_plottimeseries(ii_data,ii_cfg,{'X','Y','X_fix','Y_fix','TarX','TarY'},'noselections')
+% legend({'X','Y','X fix','Y fix'})
 % select the fixation used for drift correction
 if ~ismember('drift',skip_steps)
 
@@ -216,13 +220,17 @@ ii_cfg.params = ii_params;
 ii_savedata(ii_data,ii_cfg,preproc_fn);
 
 
-% get the saccades
-[ii_data,ii_cfg,ii_sacc] = ii_extractsaccades(ii_data,ii_cfg,{'X','Y'},...
-    ii_params.extract_sacc_mode_start,...
-    ii_params.extract_sacc_mode_end,...
-    ii_params.epoch_chan);
-
-% save the saccades
-ii_savesacc(ii_cfg,ii_sacc,[preproc_fn(1:end-4) '_sacc.mat']);
+%% get the saccades
+% This might cause issue if your task does not require saccade and the participants didn't make any saccade
+% In this case, you don't need it
+if ~ismember('getSaccades',skip_steps)
+    [ii_data,ii_cfg,ii_sacc] = ii_extractsaccades(ii_data,ii_cfg,{'X','Y'},...
+        ii_params.extract_sacc_mode_start,...
+        ii_params.extract_sacc_mode_end,...
+        ii_params.epoch_chan);
+    
+    % save the saccades
+    ii_savesacc(ii_cfg,ii_sacc,[preproc_fn(1:end-4) '_sacc.mat']);
+end
 
 end
